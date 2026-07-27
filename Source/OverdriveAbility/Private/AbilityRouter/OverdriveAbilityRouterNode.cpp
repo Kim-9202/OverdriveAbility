@@ -31,7 +31,7 @@ const UOverdriveAbilityRouterEdge* UOverdriveAbilityRouterNode::GetRouterEdge(co
 	return EdgeMap.Contains(OtherNode) ? EdgeMap[OtherNode] : nullptr;
 }
 
-const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterNode::GetRouterNodeToActivate(const FGameplayTag& InInputTypeTag, bool bInPressed, const FGameplayTagContainer& InStateTags) const
+const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterNode::GetRouterNodeToActivate(const UOverdriveAbilityRouterComponent* InRouterComponent, bool bInPressed, const FGameplayTag& InInputTypeTag, const FGameplayTagContainer& InStateTags) const
 {
 	return this;
 }
@@ -70,7 +70,7 @@ void UOverdriveAbilityRouterNode_Simple::PostEditChangeProperty(FPropertyChanged
 }
 #endif
 
-const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterNode_Proxy::GetRouterNodeToActivate(const FGameplayTag& InInputTypeTag, bool bInPressed, const FGameplayTagContainer& InStateTags) const
+const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterNode_Proxy::GetRouterNodeToActivate(const UOverdriveAbilityRouterComponent* InRouterComponent, bool bInPressed, const FGameplayTag& InInputTypeTag, const FGameplayTagContainer& InStateTags) const
 {
 	return TargetRouterNode;
 }

@@ -223,12 +223,17 @@ bool UOverdriveAbilityRouterComponent::ProcessInput(bool bPressed, const FGamepl
 		LocalRouterNode = AbilityGraph->GetRootRouterNode();
 	}
 
-	const UOverdriveAbilityRouterNode* LocalNextNode = FindNodeToActivate(LocalRouterNode, bPressed, InputTypeTag);
+	// ASC 소유 태그(GE/어빌리티가 붙인 상태)도 엣지 조건에 참여시킨다. 로컬·전역 두 순회가 공유하도록 여기서 한 번만 만든다.
+	// 인자를 받는 GetOwnedGameplayTags 오버로드는 컨테이너를 Reset하므로 인자 없는 쪽을 써야 한다.
+	FGameplayTagContainer EvaluationTags = StateTagContainer;
+	EvaluationTags.AppendTags(WeakAbilitySystem->GetOwnedGameplayTags());
+
+	const UOverdriveAbilityRouterNode* LocalNextNode = FindNodeToActivate(LocalRouterNode, bPressed, InputTypeTag, EvaluationTags);
 
 	// 로컬 순회 실패 → 어느 상태에서든 열려 있는 전역 규칙(대쉬·점프 등)에 두 번째 기회를 준다.
 	if (LocalNextNode == nullptr)
 	{
-		LocalNextNode = FindNodeToActivate(AbilityGraph->GetGlobalSecondChanceRouterNode(), bPressed, InputTypeTag);
+		LocalNextNode = FindNodeToActivate(AbilityGraph->GetGlobalSecondChanceRouterNode(), bPressed, InputTypeTag, EvaluationTags);
 	}
 
 	if (LocalNextNode == nullptr)
@@ -263,7 +268,7 @@ bool UOverdriveAbilityRouterComponent::ProcessInput(bool bPressed, const FGamepl
 	return true;
 }
 
-const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterComponent::FindNodeToActivate(const UOverdriveAbilityRouterNode* StartNode, bool bPressed, const FGameplayTag& InputTypeTag) const
+const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterComponent::FindNodeToActivate(const UOverdriveAbilityRouterNode* StartNode, bool bPressed, const FGameplayTag& InputTypeTag, const FGameplayTagContainer& InStateTags) const
 {
 	// 시작 노드가 없을 수 있다: Root 미설정 그래프, GlobalSecondChance가 없는 구버전 에셋 등.
 	if (StartNode == nullptr)
@@ -286,14 +291,14 @@ const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterComponent::FindNodeToA
 			continue;
 		}
 
-		if (!RouterEdge->CanEnterEndNode(bPressed, InputTypeTag, StateTagContainer))
+		if (!RouterEdge->CanEnterEndNode(this, bPressed, InputTypeTag, InStateTags))
 		{
 			continue;
 		}
 
 		// Proxy 체인 해소: 자기 자신을 반환할 때까지 타깃을 따라간다.
 		const UOverdriveAbilityRouterNode* CurrentHop = ChildNode;
-		const UOverdriveAbilityRouterNode* NextHop = ChildNode->GetRouterNodeToActivate(InputTypeTag, bPressed, StateTagContainer);
+		const UOverdriveAbilityRouterNode* NextHop = ChildNode->GetRouterNodeToActivate(this, bPressed, InputTypeTag, InStateTags);
 
 		int32 HopCount = 0;
 
@@ -306,7 +311,7 @@ const UOverdriveAbilityRouterNode* UOverdriveAbilityRouterComponent::FindNodeToA
 			}
 
 			CurrentHop = NextHop;
-			NextHop = NextHop->GetRouterNodeToActivate(InputTypeTag, bPressed, StateTagContainer);
+			NextHop = NextHop->GetRouterNodeToActivate(this, bPressed, InputTypeTag, InStateTags);
 		}
 
 		if (NextHop != nullptr)

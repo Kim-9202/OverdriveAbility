@@ -40,6 +40,42 @@ Unreal Engine 5.8 플러그인. GameplayAbilitySystem 확장 — **그래프 기
                                           └─ 실패 시 GlobalSecondChance에서 재탐색
 ```
 
+### 엣지 조건
+
+엣지는 "어떤 입력에 어떤 상태에서 넘어갈 수 있는가"를 담는다. 판정 항목은 넷이고, **전부 통과해야** 다음 노드로 넘어간다.
+
+| 항목 | 타입 | 판정 |
+|---|---|---|
+| `bPressed` | `bool` | Press / Release 중 어느 쪽 입력인가 |
+| `InputTypeTag` | `FGameplayTag` | 어떤 InputType 입력인가 |
+| `ConditionQuery` | `FGameplayTagQuery` | 상태 태그 + ASC 소유 태그가 쿼리에 맞는가 (비어 있으면 통과) |
+| `EdgeConditions` | `TArray<TObjectPtr<UOverdriveAbilityRouterEdgeCondition>>` | 모든 조건 오브젝트가 true를 반환하는가 (비어 있으면 통과) |
+
+싼 것부터 순서대로 평가한다: 필드 비교 → 태그 쿼리 → 조건 오브젝트.
+
+### UOverdriveAbilityRouterEdgeCondition
+
+태그로 표현되지 않는 조건 — 어트리뷰트 값 비교, 이동 상태, 타깃 존재 여부 등 — 을 위한 **Instanced 조건 오브젝트**다. 엣지의 `Edge Conditions` 배열에 여러 개를 매달 수 있고, 전부 true여야 통과한다(AND).
+
+`CanEnterEndNode`는 엣지의 판정 함수와 **같은 매개변수**를 받는다. 라우터 컴포넌트가 함께 넘어오므로 오너 액터·ASC·입력 차단 상태 등에 접근할 수 있다.
+
+```cpp
+UCLASS()
+class UMyRouterCondition : public UOverdriveAbilityRouterEdgeCondition
+{
+	GENERATED_BODY()
+
+protected:
+	virtual bool CanEnterEndNode_Implementation(const UOverdriveAbilityRouterComponent* InRouterComponent, bool bInPressed, const FGameplayTag& InInputTypeTag, const FGameplayTagContainer& InStateTags) const override
+	{
+		const UAbilitySystemComponent* AbilitySystem = InRouterComponent ? InRouterComponent->GetAbilitySystem() : nullptr;
+		return AbilitySystem && AbilitySystem->GetNumericAttribute(UMyAttributeSet::GetStaminaAttribute()) >= 30.0f;
+	}
+};
+```
+
+`BlueprintNativeEvent`라 **블루프린트 서브클래스에서도 오버라이드**할 수 있다. C++ 없이 조건을 추가할 때 쓴다. 기본 구현은 `true`(조건 없음 = 통과)이므로, 오버라이드를 빼먹어도 기존 동작을 막지 않는다.
+
 ### 입력 버퍼
 
 매칭에 실패한 Press 입력은 단일 슬롯에 잠시 보관된다(기본 0.2초). 상태 태그가 바뀌어 콤보 창이 열리면 보관된 입력이 재평가되어 발동한다. 창이 열리기 직전에 누른 입력이 씹히지 않게 하기 위한 장치다.
@@ -57,6 +93,8 @@ RouterComponent->BlockInputTag(DodgeInputTag);
 ```
 
 - `AddStateTag` / `RemoveStateTag` — 엣지 조건이 참조하는 상태. 변경 시 버퍼 입력 재평가
+  - 엣지 `ConditionQuery`가 실제로 매칭하는 대상은 **이 상태 태그 + ASC 소유 태그**를 합친 집합이다. GE·어빌리티가 붙인 태그(공중/무적/스턴 등)로도 전이 조건을 걸 수 있다
+  - 단 `HasStateTag()` / `GetOwnedGameplayTags()`는 컴포넌트 자체 상태 태그만 반환한다
 - `BlockInputTag` / `UnblockInputTag` — 카운트 기반 입력 차단
 - `GetInputReactionDelegate(bPressed, InputType)` — 바인딩하면 해당 입력은 그래프 순회 대신 델리게이트만 실행한다. 차지·홀드처럼 어빌리티가 입력을 직접 소비할 때 사용
 

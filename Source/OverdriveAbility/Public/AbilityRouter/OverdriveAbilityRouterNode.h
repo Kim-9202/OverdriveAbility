@@ -10,6 +10,7 @@
 class UGameplayAbility;
 class UOverdriveAbilityRouterEdge;
 class UOverdriveAbilityRouterGraph;
+class UOverdriveAbilityRouterComponent;
 
 /**
  * 
@@ -52,7 +53,10 @@ public:
 
 	const UOverdriveAbilityRouterEdge* GetRouterEdge(const UOverdriveAbilityRouterNode* OtherNode) const;
 
-	virtual const UOverdriveAbilityRouterNode* GetRouterNodeToActivate(const FGameplayTag& InInputTypeTag, bool bInPressed, const FGameplayTagContainer& InStateTags) const;
+	// 이 노드가 실제로 발동할 노드를 반환한다. 자기 자신을 반환하면 종착점(라우터의 체인 추적 종료 조건).
+	// InStateTags = 라우터의 StateTagContainer + ASC 소유 태그(호출부에서 병합해 전달).
+	// InRouterComponent는 판정에 라우터 런타임 상태가 필요할 때를 위한 확장 컨텍스트(현재 기본 구현은 미사용).
+	virtual const UOverdriveAbilityRouterNode* GetRouterNodeToActivate(const UOverdriveAbilityRouterComponent* InRouterComponent, bool bInPressed, const FGameplayTag& InInputTypeTag, const FGameplayTagContainer& InStateTags) const;
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
@@ -147,7 +151,7 @@ private:
 	TObjectPtr<UOverdriveAbilityRouterNode> TargetRouterNode;
 
 protected:
-	virtual const UOverdriveAbilityRouterNode* GetRouterNodeToActivate(const FGameplayTag& InInputTypeTag, bool bInPressed, const FGameplayTagContainer& InStateTags) const override;
+	virtual const UOverdriveAbilityRouterNode* GetRouterNodeToActivate(const UOverdriveAbilityRouterComponent* InRouterComponent, bool bInPressed, const FGameplayTag& InInputTypeTag, const FGameplayTagContainer& InStateTags) const override;
 
 #if WITH_EDITOR
 public:

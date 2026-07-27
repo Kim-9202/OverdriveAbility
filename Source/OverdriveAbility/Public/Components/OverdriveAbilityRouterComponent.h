@@ -127,7 +127,8 @@ private:
 
 	// StartNode의 자식 중 엣지 조건을 만족하는 노드를 찾아 Proxy 체인까지 해소한 결과를 반환. 없으면 nullptr.
 	// ProcessInput이 로컬(CurrentNode)과 전역 폴백(GlobalSecondChance) 두 시작점으로 각각 호출한다.
-	const UOverdriveAbilityRouterNode* FindNodeToActivate(const UOverdriveAbilityRouterNode* StartNode, bool bPressed, const FGameplayTag& InputTypeTag) const;
+	// InStateTags는 ProcessInput이 한 번 만들어 두 호출에 공유하는 병합 태그(StateTagContainer + ASC 소유 태그).
+	const UOverdriveAbilityRouterNode* FindNodeToActivate(const UOverdriveAbilityRouterNode* StartNode, bool bPressed, const FGameplayTag& InputTypeTag, const FGameplayTagContainer& InStateTags) const;
 
 	// 폰 재시작(=InputComponent 생성 직후) / 빙의 변경 훅. 다이나믹 델리게이트라 UFUNCTION 필수.
 	UFUNCTION()
