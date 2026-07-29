@@ -85,9 +85,7 @@ public:
 
 	// bPressed: true = Press, false = Release.
 	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility", meta = (AutoCreateRefTerm = "InputTypeTag"))
-	void AbilityInputActionEvent(
-		bool bPressed,
-		UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.InputType")) const FGameplayTag& InputTypeTag);
+	void AbilityInputActionEvent(bool bPressed,	UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.InputType")) const FGameplayTag& InputTypeTag);
 
 	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility|InputBlock", meta = (AutoCreateRefTerm = "InputTypeTag"))
 	void BlockInputTag(UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.InputType")) const FGameplayTag& InputTypeTag);
@@ -107,6 +105,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "OverdriveAbility|State", meta = (AutoCreateRefTerm = "StateTag"))
 	bool HasStateTag(UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.State")) const FGameplayTag& StateTag) const;
+
+	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility|State", meta = (AutoCreateRefTerm = "TagsToRemove,TagsToAdd"))
+	void UpdateStateTags(UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.State")) const FGameplayTagContainer& TagsToRemove, UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.State")) const FGameplayTagContainer& TagsToAdd);
+
+	// 상태 태그를 통째로 덮어쓴다. 빈 컨테이너를 넘기면 전부 해제.
+	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility|State", meta = (AutoCreateRefTerm = "NewStateTags"))
+	void SetStateTags(UPARAM(meta = (Categories = "OverdriveAbility.AbilityRouter.State")) const FGameplayTagContainer& NewStateTags);
 
 	// (bPressed, InputType) 조합에 대한 입력 반응 델리게이트를 반환(없으면 생성). 바인딩 시 해당 입력은 그래프 순회 대신 델리게이트만 실행.
 	FOverdriveAbilityInputReactionDelegate& GetInputReactionDelegate(bool bPressed, const FGameplayTag& InputTypeTag);

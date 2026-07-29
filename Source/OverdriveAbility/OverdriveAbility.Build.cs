@@ -34,6 +34,8 @@ public class OverdriveAbility : ModuleRules
 				"GameplayTags",
 				// 라우터 컴포넌트의 public 헤더가 TObjectPtr<const UInputAction>를 노출.
 				"EnhancedInput",
+				// AnimNotify public 헤더가 Animation/AnimNotifies/AnimNotify.h를 include.
+				"Engine",
 			}
 			);
 
@@ -42,7 +44,6 @@ public class OverdriveAbility : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore",
 				// ... add private dependencies that you statically link with here ...

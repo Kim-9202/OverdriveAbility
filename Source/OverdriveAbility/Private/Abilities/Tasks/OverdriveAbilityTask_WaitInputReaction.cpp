@@ -3,6 +3,7 @@
 
 #include "Tasks/OverdriveAbilityTask_WaitInputReaction.h"
 #include "Components/OverdriveAbilityRouterComponent.h"
+#include "OverdriveAbilityBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 
 UOverdriveAbilityTask_WaitInputReaction* UOverdriveAbilityTask_WaitInputReaction::WaitInputReaction(UGameplayAbility* OwningAbility,
@@ -23,7 +24,7 @@ void UOverdriveAbilityTask_WaitInputReaction::Activate()
 	AActor* TargetActor = ExternalTarget.IsValid() ? ExternalTarget.Get()
 		: (AbilitySystemComponent.IsValid() ? AbilitySystemComponent->GetAvatarActor() : nullptr);
 
-	RouterComponent = TargetActor ? TargetActor->FindComponentByClass<UOverdriveAbilityRouterComponent>() : nullptr;
+	RouterComponent = UOverdriveAbilityBlueprintLibrary::GetAbilityRouterComponent(TargetActor);
 
 	if (!RouterComponent.IsValid())
 	{

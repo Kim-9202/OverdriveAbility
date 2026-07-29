@@ -3,6 +3,7 @@
 
 #include "Async/OverdriveAbilityAsync_WaitInputReaction.h"
 #include "Components/OverdriveAbilityRouterComponent.h"
+#include "OverdriveAbilityBlueprintLibrary.h"
 #include "UObject/Package.h"
 
 UOverdriveAbilityAsync_WaitInputReaction* UOverdriveAbilityAsync_WaitInputReaction::WaitInputReactionOnActor(AActor* TargetActor,
@@ -33,7 +34,7 @@ void UOverdriveAbilityAsync_WaitInputReaction::Activate()
 {
 	Super::Activate();
 
-	RouterComponent = TargetActor.IsValid() ? TargetActor->FindComponentByClass<UOverdriveAbilityRouterComponent>() : nullptr;
+	RouterComponent = UOverdriveAbilityBlueprintLibrary::GetAbilityRouterComponent(TargetActor.Get());
 
 	if (!RouterComponent.IsValid())
 	{

@@ -87,7 +87,7 @@ TSharedRef<SDockTab> FAbilityRouterGraphEditorToolkit::SpawnTab_Viewport(const F
 TSharedRef<SGraphEditor> FAbilityRouterGraphEditorToolkit::CreateRouterGraphEditorWidget()
 {
 	FGraphAppearanceInfo AppearanceInfo;
-	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_GenericGraph", "Generic Graph");
+	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_AbilityRouterGraph", "Ability Router Graph");
 
 	CreateCommandList();
 

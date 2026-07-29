@@ -12,6 +12,7 @@
 #include "OverdriveAbilityBlueprintLibrary.generated.h"
 
 class UAbilitySystemComponent;
+class UOverdriveAbilityRouterComponent;
 
 UENUM()
 enum class EOverdriveStructUtilsResult : uint8
@@ -28,7 +29,11 @@ class OVERDRIVEABILITY_API UOverdriveAbilityBlueprintLibrary : public UBlueprint
 {
 	GENERATED_BODY()
 	
-public:	
+public:
+	/** 액터의 AbilityRouter 컴포넌트를 반환한다. 라우터는 Pawn에 붙는 것이 전제이며, 조회 지점을 여기로 단일화한다. */
+	UFUNCTION(BlueprintPure, Category = "OverdriveAbility|Router", meta = (DefaultToSelf = "Actor"))
+	static UOverdriveAbilityRouterComponent* GetAbilityRouterComponent(AActor* Actor);
+
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "OverdriveAbility|Context", meta = (CustomStructureParam = "InFragment", BlueprintInternalUseOnly = "true"))
 	static void AddContextFragment(const FGameplayEffectContextHandle& Handle, const int32& InFragment);
 

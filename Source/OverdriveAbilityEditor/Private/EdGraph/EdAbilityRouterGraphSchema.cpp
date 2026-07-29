@@ -238,7 +238,7 @@ void UEdAbilityRouterGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphN
 	}
 	if (const UEdAbilityRouterGraphNode* RouterNode = Cast<UEdAbilityRouterGraphNode>(Context->Node); RouterNode)
 	{
-		FToolMenuSection& Section = Menu->AddSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("ClassActionsMenuHeader", "Node Actions"));
+		FToolMenuSection& Section = Menu->AddSection("AbilityRouterGraphSchemaNodeActions", LOCTEXT("ClassActionsMenuHeader", "Node Actions"));
 		
 		// 진입점 노드(Root/GlobalSecondChance)는 삭제·복제할 수 없으므로 해당 메뉴를 숨긴다.
 		const bool bIsEntryNode = Cast<UOverdriveAbilityRouterNode_Root>(RouterNode->RouterNode) != nullptr

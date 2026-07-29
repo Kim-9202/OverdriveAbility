@@ -98,8 +98,8 @@ void FAbilityRouterGraphDragDropAction::HoverTargetChanged()
 			}
 			else
 			{
-#define LOCTEXT_NAMESPACE "AssetSchema_GenericGraph"
-				Response = FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UGenericGraphEdNode"));
+#define LOCTEXT_NAMESPACE "AssetSchema_AbilityRouterGraph"
+				Response = FPinConnectionResponse(CONNECT_RESPONSE_DISALLOW, LOCTEXT("PinError", "Not a valid UEdAbilityRouterGraphNode"));
 #undef LOCTEXT_NAMESPACE
 			}
 

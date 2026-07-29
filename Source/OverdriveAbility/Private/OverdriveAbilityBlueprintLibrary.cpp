@@ -3,6 +3,8 @@
 
 #include "OverdriveAbilityBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Components/OverdriveAbilityRouterComponent.h"
+#include "GameFramework/Actor.h"
 #include "GameplayEffectAggregator.h"
 #include "Kismet/BlueprintInstancedStructLibrary.h"
 #include "Blueprint/BlueprintExceptionInfo.h"
@@ -12,6 +14,16 @@
 
 #define LOCTEXT_NAMESPACE "UOverdriveAbilityBlueprintLibrary"
 
+
+UOverdriveAbilityRouterComponent* UOverdriveAbilityBlueprintLibrary::GetAbilityRouterComponent(AActor* Actor)
+{
+	if (Actor == nullptr)
+	{
+		return nullptr;
+	}
+
+	return Actor->FindComponentByClass<UOverdriveAbilityRouterComponent>();
+}
 
 void UOverdriveAbilityBlueprintLibrary::AddContextFragment(const FGameplayEffectContextHandle& Handle, const int32& InFragment)
 {

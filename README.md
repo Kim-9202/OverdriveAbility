@@ -21,6 +21,10 @@ Unreal Engine 5.8 플러그인. GameplayAbilitySystem 확장 — **그래프 기
 
 ### AbilityRouter
 
+![AbilityRouter Graph](Docs/Images/AbilityRouterGraph_Sample.png)
+
+*Root에서 WeakAttack / StrongAttack 입력으로 분기하는 콤보 그래프. 아래쪽 `GlobalSecondChance`는 Root의 자식이 아니라 형제라 어느 상태에서든 열려 있다.*
+
 전용 그래프 에디터를 가진 애셋이다. 노드 종류는 넷이다.
 
 | 노드 | 역할 |

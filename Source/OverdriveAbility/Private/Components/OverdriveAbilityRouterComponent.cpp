@@ -366,6 +366,12 @@ bool UOverdriveAbilityRouterComponent::IsInputTypeBlocked(const FGameplayTag& In
 
 void UOverdriveAbilityRouterComponent::AddStateTag(const FGameplayTag& StateTag)
 {
+	// 이미 보유 중이면 평가 입력이 그대로이므로 재평가할 이유가 없다.
+	if (!StateTag.IsValid() || StateTagContainer.HasTagExact(StateTag))
+	{
+		return;
+	}
+
 	StateTagContainer.AddTag(StateTag);
 
 	// 콤보 창이 열렸을 수 있으니 미뤘던 입력을 재평가.
@@ -374,6 +380,11 @@ void UOverdriveAbilityRouterComponent::AddStateTag(const FGameplayTag& StateTag)
 
 void UOverdriveAbilityRouterComponent::RemoveStateTag(const FGameplayTag& StateTag)
 {
+	if (!StateTagContainer.HasTagExact(StateTag))
+	{
+		return;
+	}
+
 	StateTagContainer.RemoveTag(StateTag);
 
 	// ConditionQuery가 태그 부재를 요구할 수도 있어 제거 시에도 재평가.
@@ -383,6 +394,50 @@ void UOverdriveAbilityRouterComponent::RemoveStateTag(const FGameplayTag& StateT
 bool UOverdriveAbilityRouterComponent::HasStateTag(const FGameplayTag& StateTag) const
 {
 	return StateTagContainer.HasTag(StateTag);
+}
+
+void UOverdriveAbilityRouterComponent::UpdateStateTags(const FGameplayTagContainer& TagsToRemove, const FGameplayTagContainer& TagsToAdd)
+{
+	bool bChanged = false;
+
+	for (const FGameplayTag& Tag : TagsToRemove)
+	{
+		if (!StateTagContainer.HasTagExact(Tag))
+		{
+			continue;
+		}
+
+		StateTagContainer.RemoveTag(Tag);
+		bChanged = true;
+	}
+
+	for (const FGameplayTag& Tag : TagsToAdd)
+	{
+		if (!Tag.IsValid() || StateTagContainer.HasTagExact(Tag))
+		{
+			continue;
+		}
+
+		StateTagContainer.AddTag(Tag);
+		bChanged = true;
+	}
+
+	if (bChanged)
+	{
+		FlushInputBuffer();
+	}
+}
+
+void UOverdriveAbilityRouterComponent::SetStateTags(const FGameplayTagContainer& NewStateTags)
+{
+	if (StateTagContainer == NewStateTags)
+	{
+		return;
+	}
+
+	StateTagContainer = NewStateTags;
+
+	FlushInputBuffer();
 }
 
 FOverdriveAbilityInputReactionDelegate& UOverdriveAbilityRouterComponent::GetInputReactionDelegate(bool bPressed, const FGameplayTag& InputTypeTag)
