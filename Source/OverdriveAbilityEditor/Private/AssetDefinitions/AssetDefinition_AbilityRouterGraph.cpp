@@ -11,7 +11,7 @@
 #include "AbilityRouter/OverdriveAbilityRouterGraph.h"
 #include "OverdriveAbilityEditorModule.h"
 
-#define LOCTEXT_NAMESPACE "FOverdriveGrimoireEditorModule"
+#define LOCTEXT_NAMESPACE "FOverdriveAbilityEditorModule"
 
 namespace MenuExtension_AbilityRouterGraph
 {
@@ -75,7 +75,7 @@ TConstArrayView<FAssetCategoryPath> UAssetDefinition_AbilityRouterGraph::GetAsse
 
 FText UAssetDefinition_AbilityRouterGraph::GetAssetDescription(const FAssetData& AssetData) const
 {
-	return LOCTEXT("AssetDefinition_AbilityRouterGraph_Description", "Data Asset that define a Grimoire, Use Ability and GameplayEffect by ReaderComponent");
+	return LOCTEXT("AssetDefinition_AbilityRouterGraph_Description", "Graph asset that defines which ability an input activates, evaluated by the AbilityRouter component.");
 }
 
 EAssetCommandResult UAssetDefinition_AbilityRouterGraph::OpenAssets(const FAssetOpenArgs& OpenArgs) const

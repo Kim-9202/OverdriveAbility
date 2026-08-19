@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "OverdriveAbilityEditorModule.h"
-#include "OverdriveAbilityEditorModeCommands.h"
 #include "AbilityRouter/OverdriveAbilityRouterGraph.h"
 #include "EdGraph/AbilityRouterGraphAssetEditor.h"
 #include "AbilityRouter/OverdriveAbilityRouterNode.h"
@@ -19,8 +18,6 @@ const FText FOverdriveAbilityEditorModule::AbilityCategory = LOCTEXT("Ability Ca
 void FOverdriveAbilityEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-
-	FOverdriveAbilityEditorModeCommands::Register();
 
 	FPropertyEditorModule& PropertyEditor = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	// 런타임 Proxy 노드의 TargetRouterNode를 "같은 그래프 형제 노드" 콤보박스로 대체.
@@ -52,9 +49,6 @@ void FOverdriveAbilityEditorModule::ShutdownModule()
 		PropertyEditor.UnregisterCustomClassLayout(UOverdriveAbilityRouterNode_Proxy::StaticClass()->GetFName());
 		PropertyEditor.NotifyCustomizationModuleChanged();
 	}
-
-
-	FOverdriveAbilityEditorModeCommands::Unregister();
 }
 
 const FText& FOverdriveAbilityEditorModule::GetOverdrivePluginCategory()

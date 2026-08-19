@@ -362,6 +362,15 @@ void UOverdriveGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 
 void UOverdriveGameplayAbility::OnEndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	for (UOverdriveAbilityFragment* Fragment : Fragments)
+	{
+		if (!Fragment)
+		{
+			continue;
+		}
+		Fragment->EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	}
+
 	if (CooldownPolicy && CooldownPolicy->GetApplyPhase() == EOverdriveAbilityApplyPhase::OnEnd)
 	{
 		CooldownPolicy->ApplyCooldown(Handle, ActorInfo, ActivationInfo, &CurrentEventData);

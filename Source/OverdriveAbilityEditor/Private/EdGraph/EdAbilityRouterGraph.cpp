@@ -98,7 +98,7 @@ void UEdAbilityRouterGraph::RebuildAbilityRouterGraph()
 
 			RouterEdgeMap.Add(RouterEdge, EdRouterEdge);
 
-			RouterEdge->SetRouterGrpah(RouterGraph);
+			RouterEdge->SetRouterGraph(RouterGraph);
 
 			if (RouterEdge->GetOuter() != RouterGraph)
 			{

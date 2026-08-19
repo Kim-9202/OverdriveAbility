@@ -59,7 +59,7 @@ public:
 	const UOverdriveAbilityRouterNode* GetEndNode() const { return EndNode; }
 
 #if WITH_EDITOR
-	void SetRouterGrpah(UOverdriveAbilityRouterGraph* NewRouterGraph) { RouterGraph = NewRouterGraph; }
+	void SetRouterGraph(UOverdriveAbilityRouterGraph* NewRouterGraph) { RouterGraph = NewRouterGraph; }
 	void SetStartNode(UOverdriveAbilityRouterNode* NewStartNode) { StartNode = NewStartNode; }
 	void SetEndNode(UOverdriveAbilityRouterNode* NewEndNode) { EndNode = NewEndNode; }
 #endif
