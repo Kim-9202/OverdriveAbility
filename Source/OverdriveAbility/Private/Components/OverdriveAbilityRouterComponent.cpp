@@ -6,13 +6,15 @@
 #include "AbilityRouter/OverdriveAbilityRouterGraph.h"
 #include "AbilityRouter/OverdriveAbilityRouterNode.h"
 #include "AbilityRouter/OverdriveAbilityRouterEdge.h"
-#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemFinders/OverdriveAbilitySystemFinder.h"
+#include "AbilitySystemFinders/OverdriveAbilitySystemFinder_Owner.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/Pawn.h"
 
 UOverdriveAbilityRouterComponent::UOverdriveAbilityRouterComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	AbilitySystemFinderClass = UOverdriveAbilitySystemFinder_Owner::StaticClass();
 }
 
 void UOverdriveAbilityRouterComponent::BeginPlay()
@@ -33,6 +35,8 @@ void UOverdriveAbilityRouterComponent::BeginPlay()
 
 void UOverdriveAbilityRouterComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	DestroyAbilitySystemFinder();
+
 	UnbindInputActions();
 
 	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
@@ -151,9 +155,57 @@ void UOverdriveAbilityRouterComponent::InitializeRouterComponent()
 
 }
 
+void UOverdriveAbilityRouterComponent::SetAbilitySystemFinderClass(TSubclassOf<UOverdriveAbilitySystemFinder> InFinderClass)
+{
+	if (!ensure(InFinderClass))
+	{
+		return;
+	}
+
+	AbilitySystemFinderClass = InFinderClass;
+}
+
 void UOverdriveAbilityRouterComponent::InitializeAbilitySystem()
 {
-	WeakAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+	if (!ensure(AbilitySystemFinderClass))
+	{
+		return;
+	}
+
+	AbilitySystemFinder = NewObject<UOverdriveAbilitySystemFinder>(this, AbilitySystemFinderClass);
+	AbilitySystemFinder->WeakOwnerComponent = this;
+	AbilitySystemFinder->RetryPeriod = AbilitySystemFindPeriod;
+	AbilitySystemFinder->MaxAttemptCount = AbilitySystemFindMaxCount;
+	AbilitySystemFinder->OnFound.BindUObject(this, &UOverdriveAbilityRouterComponent::HandleAbilitySystemFound);
+	AbilitySystemFinder->OnFailed.BindUObject(this, &UOverdriveAbilityRouterComponent::HandleAbilitySystemFindFailed);
+
+	AbilitySystemFinder->StartFind();
+}
+
+void UOverdriveAbilityRouterComponent::HandleAbilitySystemFound(UAbilitySystemComponent* FoundAbilitySystem)
+{
+	DestroyAbilitySystemFinder();
+
+	WeakAbilitySystem = FoundAbilitySystem;
+}
+
+void UOverdriveAbilityRouterComponent::HandleAbilitySystemFindFailed()
+{
+	DestroyAbilitySystemFinder();
+
+	ensureMsgf(false, TEXT("%hs::Can't Find AbilitySystem."), __FUNCTION__);
+}
+
+void UOverdriveAbilityRouterComponent::DestroyAbilitySystemFinder()
+{
+	if (!IsValid(AbilitySystemFinder))
+	{
+		return;
+	}
+
+	AbilitySystemFinder->StopFind();
+	AbilitySystemFinder->MarkAsGarbage();
+	AbilitySystemFinder = nullptr;
 }
 
 void UOverdriveAbilityRouterComponent::AbilityInputActionEvent(bool bPressed, const FGameplayTag& InputTypeTag)

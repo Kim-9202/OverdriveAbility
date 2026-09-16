@@ -19,7 +19,7 @@ struct FGameplayEventData;
 /**
  * 
  */
-UCLASS(Abstract, DefaultToInstanced, NotBlueprintable, BlueprintType, EditInlineNew, Transient)
+UCLASS(Abstract, DefaultToInstanced, NotBlueprintable, BlueprintType, EditInlineNew, Transient, CollapseCategories)
 class OVERDRIVEABILITY_API UOverdriveAbilityCooldownPolicy : public UObject
 {
 	GENERATED_BODY()
@@ -35,7 +35,7 @@ public:
 #endif
 
 private:
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Phase", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase", meta = (AllowPrivateAccess = "true"))
 	EOverdriveAbilityApplyPhase ApplyPhase;
 
 public:

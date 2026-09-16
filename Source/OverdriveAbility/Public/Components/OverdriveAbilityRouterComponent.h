@@ -8,11 +8,13 @@
 #include "GameplayTagContainer.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayEffectTypes.h"
+#include "Templates/SubclassOf.h"
 #include "OverdriveAbilityRouterComponent.generated.h"
 
 class UOverdriveAbilityRouterNode;
 class UOverdriveAbilityRouterGraph;
 class UOverdriveAbilitySystemComponent;
+class UOverdriveAbilitySystemFinder;
 class UGameplayAbility;
 class UAbilitySystemComponent;
 class UInputAction;
@@ -122,6 +124,9 @@ public:
 
 	UAbilitySystemComponent* GetAbilitySystem() const;
 
+	// 탐색 전략 교체. 소유 액터 생성자에서 부르는 용도이며, BeginPlay 이후 호출은 효과가 없다.
+	void SetAbilitySystemFinderClass(TSubclassOf<UOverdriveAbilitySystemFinder> InFinderClass);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -194,5 +199,23 @@ private:
 	void InitializeRouterComponent();
 
 	void InitializeAbilitySystem();
+
+	void HandleAbilitySystemFound(UAbilitySystemComponent* FoundAbilitySystem);
+
+	void HandleAbilitySystemFindFailed();
+
+	void DestroyAbilitySystemFinder();
+
+	UPROPERTY(EditDefaultsOnly, Category = "OverdriveAbility|AbilitySystem", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UOverdriveAbilitySystemFinder> AbilitySystemFinderClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "OverdriveAbility|AbilitySystem", meta = (AllowPrivateAccess = "true", ClampMin = "0.01", UIMin = "0.01", ForceUnits = "s"))
+	float AbilitySystemFindPeriod = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "OverdriveAbility|AbilitySystem", meta = (AllowPrivateAccess = "true", ClampMin = "1", UIMin = "1"))
+	int32 AbilitySystemFindMaxCount = 20;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UOverdriveAbilitySystemFinder> AbilitySystemFinder;
 };
 
