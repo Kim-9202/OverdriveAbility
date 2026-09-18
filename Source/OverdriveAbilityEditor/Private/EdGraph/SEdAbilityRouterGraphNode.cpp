@@ -81,10 +81,6 @@ void SEdAbilityRouterGraphNode::Construct(const FArguments& InArgs, UEdAbilityRo
 	IsEditable = false;
 
 	UpdateGraphNode();
-	if (InNode)
-	{
-		InNode->SEdRouterNode = this;
-	}
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -102,7 +98,6 @@ void SEdAbilityRouterGraphNode::UpdateGraphNode()
 	RightNodeBox.Reset();
 	LeftNodeBox.Reset();
 	
-	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
 	GetOrAddSlot(ENodeZone::Center)
 	.HAlign(HAlign_Fill)
 	.VAlign(VAlign_Center)
@@ -267,7 +262,7 @@ bool SEdAbilityRouterGraphNode::IsNameReadOnly() const
 FSlateColor SEdAbilityRouterGraphNode::GetBorderBackgroundColor() const
 {
 	UEdAbilityRouterGraphNode* MyNode = CastChecked<UEdAbilityRouterGraphNode>(GraphNode);
-	return MyNode ? MyNode->GetBackgroundColor() : FLinearColor(0.0f, 0.22f, 0.4f);
+	return MyNode->GetBackgroundColor();
 }
 
 FSlateColor SEdAbilityRouterGraphNode::GetBackgroundColor() const

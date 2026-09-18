@@ -108,6 +108,6 @@ void UOAVM_FilteredPairedAttribute::OnObservedAttributeChanged(const FOnAttribut
 
 void UOAVM_FilteredPairedAttribute::RecalcPercent()
 {
-	const float NewPercent = (MaxValue > KINDA_SMALL_NUMBER) ? (CurrentValue / MaxValue) : 0.f;
+	const float NewPercent = (MaxValue > UE_KINDA_SMALL_NUMBER) ? (CurrentValue / MaxValue) : 0.f;
 	UE_MVVM_SET_PROPERTY_VALUE(Percent, NewPercent);
 }

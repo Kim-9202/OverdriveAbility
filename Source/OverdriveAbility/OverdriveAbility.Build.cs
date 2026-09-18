@@ -18,8 +18,7 @@ public class OverdriveAbility : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
-				"OverdriveAbility/Public/Abilities"
-            }
+			}
 			);
 			
 		
@@ -44,8 +43,6 @@ public class OverdriveAbility : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Slate",
-				"SlateCore",
 				// ... add private dependencies that you statically link with here ...
 			}
             );

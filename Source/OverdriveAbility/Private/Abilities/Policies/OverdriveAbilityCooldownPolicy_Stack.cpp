@@ -6,10 +6,15 @@
 #include "GameplayEffectTypes.h"
 #include "Effects/OverdriveGameplayEffectTypes.h"
 #include "GameplayEffect.h"
-#include "OverdriveAbilityBlueprintLibrary.h"
 #include "Effects/Fragments/OverdriveEffectContextFragment_Cooldown.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
+
+#define LOCTEXT_NAMESPACE "OverdriveAbilityCooldownPolicy_Stack"
 
 bool UOverdriveAbilityCooldownPolicy_Stack::CheckCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayEventData* EventData, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
@@ -128,4 +133,41 @@ void UOverdriveAbilityCooldownPolicy_Stack::ApplyCooldown(const FGameplayAbility
 		CooldownEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get(), AbilitySystemComponent->GetPredictionKeyForNewAction());
 	}
 }
+
+#if WITH_EDITOR
+EDataValidationResult UOverdriveAbilityCooldownPolicy_Stack::IsDataValid(FDataValidationContext& Context) const
+{
+	EDataValidationResult Result = Super::IsDataValid(Context);
+
+	const UOverdriveGameplayAbility* OwnerAbility = GetOwnerAbility();
+	if (OwnerAbility == nullptr)
+	{
+		return Result;
+	}
+
+	const UGameplayEffect* CooldownEffect = OwnerAbility->GetCooldownGameplayEffect();
+	if (CooldownEffect == nullptr)
+	{
+		return Result;
+	}
+
+	if (CooldownEffect->GetStackingType() == EGameplayEffectStackingType::None)
+	{
+		Context.AddError(LOCTEXT("StackingTypeIsNone", "Stack 쿨다운 정책은 스택되는 쿨다운 GE가 필요합니다. 쿨다운 GameplayEffect의 StackingType을 None이 아닌 값으로 설정하세요."));
+
+		Result = EDataValidationResult::Invalid;
+	}
+
+	if (CooldownEffect->GetStackLimitCount() <= 0)
+	{
+		Context.AddError(LOCTEXT("StackLimitCountIsUnlimited", "쿨다운 GameplayEffect의 StackLimitCount가 0 이하(무제한)입니다. Stack 쿨다운 정책은 한도가 있어야 동작하므로 1 이상으로 설정하세요."));
+
+		Result = EDataValidationResult::Invalid;
+	}
+
+	return Result;
+}
+#endif
+
+#undef LOCTEXT_NAMESPACE
 

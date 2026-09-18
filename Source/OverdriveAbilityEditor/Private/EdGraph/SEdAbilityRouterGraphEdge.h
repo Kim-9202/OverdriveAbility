@@ -26,8 +26,8 @@ public:
 
 	virtual void UpdateGraphNode() override;
 
-	// 시작/끝 노드 사이에 위젯을 배치한다. NodeIndex/MaxNodes는 같은 두 노드 사이 다중 엣지 오프셋 계산용.
-	void PositionBetweenTwoNodesWithOffset(const FGeometry& StartGeom, const FGeometry& EndGeom, int32 NodeIndex, int32 MaxNodes) const;
+	// 시작/끝 노드 사이에 위젯을 배치한다.
+	void PositionBetweenTwoNodes(const FGeometry& StartGeom, const FGeometry& EndGeom) const;
 
 	void OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo);
 

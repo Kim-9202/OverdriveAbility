@@ -264,7 +264,9 @@ bool UOverdriveAbilityRouterComponent::ProcessInput(bool bPressed, const FGamepl
 	{
 		if (ReactionDelegate->IsBound())
 		{
-			ReactionDelegate->Broadcast(bPressed, InputTypeTag);
+			// 핸들러가 다른 키를 구독하면 TMap 재할당으로 ReactionDelegate가 무효화된다.
+			FOverdriveAbilityInputReactionDelegate ReactionDelegateCopy = *ReactionDelegate;
+			ReactionDelegateCopy.Broadcast(bPressed, InputTypeTag);
 			return true; // 바인딩된 반응이 입력을 소비 → 그래프 순회/발동 생략, 버퍼 불필요
 		}
 	}
@@ -300,23 +302,33 @@ bool UOverdriveAbilityRouterComponent::ProcessInput(bool bPressed, const FGamepl
 		return false;
 	}
 
-	TArray<UGameplayAbility*> AbilityInstances = FoundSpec->GetAbilityInstances();
-	if (AbilityInstances.IsEmpty() || !AbilityInstances.Last()->IsActive())
-	{
-		return false;
-	}
-
 	// 첫 발동 시 CurrentAbilityInstance가 무효일 수 있어 가드(null TWeakObjectPtr 역참조 방지).
 	if (CurrentAbilityInstance.IsValid())
 	{
 		CurrentAbilityInstance->OnGameplayAbilityEnded.Remove(OnCurrentAbilityEndedHandle);
 	}
+	CurrentAbilityInstance.Reset();
+	OnCurrentAbilityEndedHandle.Reset();
+
 	StateTagContainer.Reset();
-
 	CurrentNode = LocalNextNode;
-	CurrentAbilityInstance = AbilityInstances.Last();
 
-	OnCurrentAbilityEndedHandle = CurrentAbilityInstance->OnGameplayAbilityEnded.AddUObject(this, &UOverdriveAbilityRouterComponent::OnCurrentAbilityEnded);
+	// 즉시 끝나는 어빌리티는 인스턴스가 남지 않는다(PerExecution은 엔진이 제거, PerActor는 IsActive()가 false).
+	// 발동 자체는 성공했으므로 입력은 소비된 것으로 보고 재시도하지 않는다.
+	TArray<UGameplayAbility*> AbilityInstances = FoundSpec->GetAbilityInstances();
+	UGameplayAbility* ActivatedInstance = AbilityInstances.IsEmpty() ? nullptr : AbilityInstances.Last();
+
+	if (ActivatedInstance != nullptr && ActivatedInstance->IsActive())
+	{
+		CurrentAbilityInstance = ActivatedInstance;
+		OnCurrentAbilityEndedHandle = CurrentAbilityInstance->OnGameplayAbilityEnded.AddUObject(this, &UOverdriveAbilityRouterComponent::OnCurrentAbilityEnded);
+	}
+	else
+	{
+		// 종료 콜백을 받을 인스턴스가 없으니 직접 호출한다. CurrentAbilityInstance가 비어 있어 가드를 통과한다.
+		OnCurrentAbilityEnded(nullptr);
+	}
+
 	return true;
 }
 

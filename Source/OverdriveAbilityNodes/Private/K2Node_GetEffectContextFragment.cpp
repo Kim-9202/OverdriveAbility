@@ -69,7 +69,21 @@ void UK2Node_GetEffectContextFragment::AllocateDefaultPins()
 {
 	Super::AllocateDefaultPins();
 
+	// 타입은 커스텀 콤보박스로만 고른다. 위젯에서 끌어내는 것을 막고, 반대 방향은 IsConnectionDisallowed가 막는다.
+	GetFragmentTypePin()->bNotConnectable = true;
+
 	RefreshPin();
+}
+
+bool UK2Node_GetEffectContextFragment::IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const
+{
+	if (MyPin == GetFragmentTypePin())
+	{
+		OutReason = TEXT("FragmentType must be chosen from the pin's combo box.");
+		return true;
+	}
+
+	return Super::IsConnectionDisallowed(MyPin, OtherPin, OutReason);
 }
 
 void UK2Node_GetEffectContextFragment::RefreshPin()

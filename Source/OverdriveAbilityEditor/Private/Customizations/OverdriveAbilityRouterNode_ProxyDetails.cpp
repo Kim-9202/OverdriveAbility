@@ -5,6 +5,7 @@
 
 #include "AbilityRouter/OverdriveAbilityRouterNode.h"
 #include "AbilityRouter/OverdriveAbilityRouterGraph.h"
+#include "EdGraph/EdAbilityRouterGraphNode.h"
 
 #include "IDetailCustomization.h"
 #include "DetailLayoutBuilder.h"
@@ -89,13 +90,21 @@ void FOverdriveAbilityRouterNode_ProxyDetails::BuildOptions()
 	}
 
 	const UOverdriveAbilityRouterGraph* RouterGraph = SelfRouterNode->GetAbilityRouterGraph();
-	if (RouterGraph == nullptr)
+	if (RouterGraph == nullptr || RouterGraph->EdGraph == nullptr)
 	{
 		return;
 	}
 
-	for (UOverdriveAbilityRouterNode* RouterNode : RouterGraph->AllRouterNodes)
+	// AllRouterNodes는 PreSave의 Rebuild 결과라 저장 전에 추가한 노드가 빠진다. EdGraph를 기준으로 돈다.
+	for (const UEdGraphNode* EdNode : RouterGraph->EdGraph->Nodes)
 	{
+		const UEdAbilityRouterGraphNode* EdRouterNode = Cast<UEdAbilityRouterGraphNode>(EdNode);
+		if (EdRouterNode == nullptr)
+		{
+			continue;
+		}
+
+		UOverdriveAbilityRouterNode* RouterNode = EdRouterNode->RouterNode;
 		if (RouterNode == nullptr)
 		{
 			continue;

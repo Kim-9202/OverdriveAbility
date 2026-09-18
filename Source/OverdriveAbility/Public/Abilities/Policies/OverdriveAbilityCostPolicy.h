@@ -29,10 +29,6 @@ public:
 
 	UOverdriveGameplayAbility* GetOwnerAbility() const;
 
-#if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
-#endif
-
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Phase", meta = (AllowPrivateAccess = "true"))
 	EOverdriveAbilityApplyPhase ApplyPhase;

@@ -89,7 +89,7 @@ public:
 	UOverdriveAbilityRouterNode_Root();
 
 #if WITH_EDITOR
-	virtual bool CanCreateConnectionFrom(const UOverdriveAbilityRouterNode* Other, FText& ErrorMessage) const;
+	virtual bool CanCreateConnectionFrom(const UOverdriveAbilityRouterNode* Other, FText& ErrorMessage) const override;
 #endif
 
 };
@@ -164,7 +164,7 @@ protected:
 	// TargetRouterNode 변경 시 CachedNodeTitle을 갱신한다.
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-	virtual bool CanCreateConnectionTo(const UOverdriveAbilityRouterNode* Other, FText& ErrorMessage) const;
+	virtual bool CanCreateConnectionTo(const UOverdriveAbilityRouterNode* Other, FText& ErrorMessage) const override;
 
 private:
 	// CachedNodeTitle 갱신 로직(PostEditChangeProperty/SetTargetRouterNode 공용).

@@ -188,7 +188,7 @@ private:
 	TWeakObjectPtr<const UOverdriveAbilityRouterNode> CurrentNode;
 	FGameplayAbilitySpecHandle CurrentSpecHandle;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "OverdriveAbility|Router")
 	const TObjectPtr<UOverdriveAbilityRouterGraph> AbilityGraph;
 
 	FDelegateHandle OnCurrentAbilityEndedHandle;

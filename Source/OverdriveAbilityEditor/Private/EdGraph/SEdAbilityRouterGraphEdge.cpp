@@ -47,7 +47,7 @@ void SEdAbilityRouterGraphEdge::PerformSecondPassLayout(const TMap<UObject*, TSh
 		}
 	}
 
-	PositionBetweenTwoNodesWithOffset(StartGeom, EndGeom, 0, 1);
+	PositionBetweenTwoNodes(StartGeom, EndGeom);
 }
 
 void SEdAbilityRouterGraphEdge::OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo)
@@ -114,7 +114,7 @@ void SEdAbilityRouterGraphEdge::UpdateGraphNode()
 		];
 }
 
-void SEdAbilityRouterGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometry& StartGeom, const FGeometry& EndGeom, int32 NodeIndex, int32 MaxNodes) const
+void SEdAbilityRouterGraphEdge::PositionBetweenTwoNodes(const FGeometry& StartGeom, const FGeometry& EndGeom) const
 {
 	// 두 박스의 중간 지점을 시드로 잡는다.
 	const FVector2D StartCenter = FGeometryHelper::CenterOf(StartGeom);
@@ -141,18 +141,7 @@ void SEdAbilityRouterGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometr
 
 	const FVector2D NewCenter = StartAnchorPoint + (0.5f * DeltaPos) + (Height * Normal);
 
-	FVector2D DeltaNormal = DeltaPos.GetSafeNormal();
-
-	// 같은 두 노드 사이에 여러 전이가 있을 때의 오프셋 계산.
-	// MultiNodeOffset: 0이 전이의 중심, -1은 PrevStateNode 방향으로 노드 1개 크기, +1은 NextStateNode 방향.
-	const float MutliNodeSpace = 0.2f; // 다중 전이 노드 사이 간격(노드 크기 단위)
-	const float MultiNodeStep = (1.f + MutliNodeSpace); // 노드 중심 간 간격(노드 크기 + 간격)
-
-	const float MultiNodeStart = -((MaxNodes - 1) * MultiNodeStep) / 2.f;
-	const float MultiNodeOffset = MultiNodeStart + (NodeIndex * MultiNodeStep);
-
-	// 노드 크기와 다중 노드 오프셋을 반영해 중심을 보정한다.
-	const FVector2D NewCorner = NewCenter - (0.5f * DesiredNodeSize) + (DeltaNormal * MultiNodeOffset * DesiredNodeSize.Size());
+	const FVector2D NewCorner = NewCenter - (0.5f * DesiredNodeSize);
 
 	GraphNode->NodePosX = static_cast<int32>(NewCorner.X);
 	GraphNode->NodePosY = static_cast<int32>(NewCorner.Y);
@@ -161,7 +150,7 @@ void SEdAbilityRouterGraphEdge::PositionBetweenTwoNodesWithOffset(const FGeometr
 FSlateColor SEdAbilityRouterGraphEdge::GetEdgeColor() const
 {
 	UEdAbilityRouterGraphEdge* EdgeNode = CastChecked<UEdAbilityRouterGraphEdge>(GraphNode);
-	if (EdgeNode != nullptr && EdgeNode->RouterEdge != nullptr)
+	if (EdgeNode->RouterEdge != nullptr)
 	{
 		// Press = 초록 계열, Release = 주황 계열로 입력 종류를 구분한다.
 		return EdgeNode->RouterEdge->IsPressed()
@@ -191,7 +180,7 @@ EVisibility SEdAbilityRouterGraphEdge::GetEdgeTitleVisbility() const
 FText SEdAbilityRouterGraphEdge::GetEdgeLabelText() const
 {
 	UEdAbilityRouterGraphEdge* EdgeNode = CastChecked<UEdAbilityRouterGraphEdge>(GraphNode);
-	const UOverdriveAbilityRouterEdge* Edge = EdgeNode ? EdgeNode->RouterEdge : nullptr;
+	const UOverdriveAbilityRouterEdge* Edge = EdgeNode->RouterEdge;
 	if (Edge == nullptr)
 	{
 		return FText::GetEmpty();

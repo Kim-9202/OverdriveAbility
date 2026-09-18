@@ -19,6 +19,7 @@ class OVERDRIVEABILITYNODES_API UK2Node_GetEffectContextFragment : public UK2Nod
 protected:
 	//~ UK2Node interface
 	virtual void NotifyPinConnectionListChanged(UEdGraphPin* Pin) override;
+	virtual bool IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const override;
 	//~ End UK2Node interface
 
 	//~ UEdGraphNode interface

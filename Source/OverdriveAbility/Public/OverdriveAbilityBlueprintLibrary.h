@@ -37,8 +37,8 @@ public:
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "OverdriveAbility|Context", meta = (CustomStructureParam = "InFragment", BlueprintInternalUseOnly = "true"))
 	static void AddContextFragment(const FGameplayEffectContextHandle& Handle, const int32& InFragment);
 
-	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility|Context", meta = (CustomStructureParam = "InFragments"))
-	static void AddContextFragments(const FGameplayEffectContextHandle& Handle, const TArray<TInstancedStruct<FOverdriveEffectContextFragment>>& InFragment);
+	UFUNCTION(BlueprintCallable, Category = "OverdriveAbility|Context")
+	static void AddContextFragments(const FGameplayEffectContextHandle& Handle, const TArray<TInstancedStruct<FOverdriveEffectContextFragment>>& InFragments);
 
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "OverdriveAbility|Context", meta = (CustomStructureParam = "Fragment", ExpandEnumAsExecs = "ExecResult", BlueprintInternalUseOnly = "true"))
 	static void GetContextFragment(EOverdriveStructUtilsResult& ExecResult, const FGameplayEffectContextHandle& Handle, UScriptStruct* FragmentType, int32& Fragment);

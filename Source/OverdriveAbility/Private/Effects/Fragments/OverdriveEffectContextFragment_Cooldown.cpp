@@ -6,6 +6,7 @@
 FOverdriveEffectContextFragment_Cooldown::FOverdriveEffectContextFragment_Cooldown()
 	: Super()
 {
+	bAbsoluteCoolTime = false;
 	AbsoluteCoolTime = 1.0f;
 }
 

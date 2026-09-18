@@ -9,10 +9,3 @@ UOverdriveGameplayAbility* UOverdriveAbilityCostPolicy::GetOwnerAbility() const
 {
 	return GetTypedOuter<UOverdriveGameplayAbility>();
 }
-
-#if WITH_EDITOR
-EDataValidationResult UOverdriveAbilityCostPolicy::IsDataValid(FDataValidationContext& Context) const
-{
-	return Super::IsDataValid(Context);
-}
-#endif

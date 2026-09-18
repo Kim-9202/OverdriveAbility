@@ -30,7 +30,6 @@ public class OverdriveAbilityEditor : ModuleRules
 				"Core",
 				// ... add other public dependencies that you statically link with here ...
 				"OverdriveAbility",
-                "PropertyEditor",
             }
             );
 			
@@ -45,6 +44,7 @@ public class OverdriveAbilityEditor : ModuleRules
 				"SlateCore",
 				"InputCore",
 				"UnrealEd",
+                "PropertyEditor",
                 "ContentBrowser",
                 "Kismet",
                 "ToolMenus",

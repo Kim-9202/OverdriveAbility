@@ -4,7 +4,6 @@
 #include "Abilities/OverdriveGameplayAbility.h"
 #include "Misc/DataValidation.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemStats.h"
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystemLog.h"
 #include "Abilities/Fragments/OverdriveAbilityFragment.h"
@@ -12,15 +11,6 @@
 #include "Abilities/Policies/OverdriveAbilityCostPolicy.h"
 
 #define LOCTEXT_NAMESPACE "OverdriveGameplayAbility"
-
-
-namespace FOverdriveAbilitySystemTweaks
-{
-	int ClearAbilityTimers = 1;
-	FAutoConsoleVariableRef CVarClearAbilityTimers(TEXT("AbilitySystem.ClearAbilityTimers"), FOverdriveAbilitySystemTweaks::ClearAbilityTimers, TEXT("Whether to call ClearAllTimersForObject as part of EndAbility call"), ECVF_Default);
-}
-
-
 
 UOverdriveGameplayAbility::UOverdriveGameplayAbility(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -389,7 +379,7 @@ EDataValidationResult UOverdriveGameplayAbility::IsDataValid(FDataValidationCont
 
 	EDataValidationResult Result = EDataValidationResult::Valid;
 
-	for (int i = 0; i <Fragments.Num(); i++)
+	for (int32 i = 0; i < Fragments.Num(); i++)
 	{
 		const UOverdriveAbilityFragment* Fragment = Fragments[i];
 		if (!Fragment)
@@ -454,3 +444,5 @@ UOverdriveAbilityFragment* UOverdriveGameplayAbility::GetAbilityFragmentByClass(
 
 	return nullptr;
 }
+
+#undef LOCTEXT_NAMESPACE

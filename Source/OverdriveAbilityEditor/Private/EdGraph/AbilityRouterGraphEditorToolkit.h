@@ -66,8 +66,6 @@ private:
 
 	//void OnJumpToNode(UEdGraphNode* Node, FName PinName);
 
-	bool bIsInitialized = false;
-
 	TSharedPtr<SGraphEditor> RouterGraphWidget;
 	TSharedPtr<FUICommandList> GraphEditorCommands;
 

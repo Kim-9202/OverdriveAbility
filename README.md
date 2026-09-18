@@ -99,8 +99,34 @@ RouterComponent->BlockInputTag(DodgeInputTag);
 - `AddStateTag` / `RemoveStateTag` — 엣지 조건이 참조하는 상태. 변경 시 버퍼 입력 재평가
   - 엣지 `ConditionQuery`가 실제로 매칭하는 대상은 **이 상태 태그 + ASC 소유 태그**를 합친 집합이다. GE·어빌리티가 붙인 태그(공중/무적/스턴 등)로도 전이 조건을 걸 수 있다
   - 단 `HasStateTag()` / `GetOwnedGameplayTags()`는 컴포넌트 자체 상태 태그만 반환한다
+- `UpdateStateTags(TagsToRemove, TagsToAdd)` — 제거 후 추가를 **한 번에** 적용. 하나씩 바꾸면 그 사이에 버퍼 입력이 재평가돼 엉뚱한 엣지로 매칭될 수 있으므로, 콤보 창을 다음 단계로 넘길 때는 이쪽을 쓴다
+- `SetStateTags(NewStateTags)` — 상태 태그를 통째로 덮어쓴다. 빈 컨테이너면 전부 해제
 - `BlockInputTag` / `UnblockInputTag` — 카운트 기반 입력 차단
+- `IsInputPressed(InputType)` — 해당 InputType이 현재 눌려 있는지
 - `GetInputReactionDelegate(bPressed, InputType)` — 바인딩하면 해당 입력은 그래프 순회 대신 델리게이트만 실행한다. 차지·홀드처럼 어빌리티가 입력을 직접 소비할 때 사용
+
+#### 애님 노티파이
+
+상태 태그 조작용 노티파이가 함께 제공된다. 몽타주에서 콤보 창을 여닫는 용도다.
+
+| 노티파이 | 동작 |
+|---|---|
+| `Ability Router: Update State Tags` | `UpdateStateTags` 호출 — 제거 → 추가를 원자적으로 |
+| `Ability Router: Set State Tags` | `SetStateTags` 호출 — 통째로 교체 |
+
+### ASC 탐색 전략
+
+라우터 컴포넌트는 붙은 액터에서 ASC를 바로 찾지 못할 수 있다. ASC가 PlayerState에 있으면 폰의 `BeginPlay` 시점엔 아직 `PlayerState`가 null이기 때문이다(스폰 → BeginPlay → Possess 순서).
+
+그래서 탐색을 **전략 클래스로 분리**하고 주기적으로 재시도한다. 컴포넌트의 `AbilitySystemFinderClass`로 고른다.
+
+| 전략 | 찾는 곳 |
+|---|---|
+| `Finder_Owner` (기본) | 컴포넌트를 소유한 액터 |
+| `Finder_Controller` | 오너의 컨트롤러 |
+| `Finder_PlayerState` | 오너의 PlayerState |
+
+재시도 주기(`AbilitySystemFindPeriod`)와 최대 횟수(`AbilitySystemFindMaxCount`)도 컴포넌트에서 조절한다. `UOverdriveAbilitySystemFinder`를 상속하면 커스텀 전략을 만들 수 있고, `FindAbilitySystem`이 `BlueprintNativeEvent`라 블루프린트로도 가능하다.
 
 ### UOverdriveGameplayAbility
 
@@ -108,10 +134,11 @@ RouterComponent->BlockInputTag(DodgeInputTag);
 
 | 정책 | 동작 |
 |---|---|
-| `CooldownPolicy_Default` | 기본 쿨다운 |
-| `CooldownPolicy_Stack` | 스택형 쿨다운(충전식) |
+| `CooldownPolicy_Default` | 쿨다운 태그를 ASC가 보유 중이면 차단 |
+| `CooldownPolicy_Stack` | 스택형 쿨다운(충전식). 스택이 한도에 닿으면 차단 |
 | `CostPolicy_Default` | 기본 코스트 |
-| `CostPolicy_CheckImmune` | 면역 상태면 코스트 면제 |
+
+`CooldownPolicy_Stack`을 쓰려면 쿨다운 GE가 **`StackingType != None`이고 `StackLimitCount >= 1`**이어야 한다. `StackLimitCount`는 0과 -1이 "무제한"을 뜻하므로 한도를 지정하지 않으면 정책이 성립하지 않는다. 설정 누락은 어빌리티 데이터 검증(`IsDataValid`)에서 에러로 잡힌다.
 
 `Fragments` 배열로 어빌리티에 재사용 가능한 동작 조각을 붙일 수 있다.
 
@@ -124,7 +151,9 @@ Commit 계열은 `FGameplayEventData`를 받는 오버로드가 함께 제공된
 - `Add Context Fragment` — 컨텍스트에 프래그먼트 추가
 - `Get Effect Context Fragment` — 타입으로 꺼내기 (와일드카드 핀)
 
-기본 제공으로 `OverdriveEffectContextFragment_Cooldown`이 있다.
+기본 제공으로 `OverdriveEffectContextFragment_Cooldown`이 있다. 쿨다운 정책이 이 프래그먼트를 읽어 절대 시간(`bAbsoluteCoolTime`)이나 SetByCaller 값으로 쿨다운을 덮어쓴다.
+
+> **이 기능은 `UOverdriveAbilitySystemGlobals` 설정을 전제로 한다.** 아래 [설치](#설치) 참고. 설정하지 않으면 프래그먼트가 붙지 않는 정도가 아니라 **정의되지 않은 동작**이 된다.
 
 ### 태스크 / 비동기 액션
 
@@ -154,6 +183,19 @@ git clone https://github.com/Kim-9202/OverdriveAbility.git
 ```
 
 `.uproject`의 `Plugins` 배열에 추가한 뒤 프로젝트 파일을 재생성하고 빌드한다.
+
+### AbilitySystemGlobals 등록 (필수)
+
+EffectContext 프래그먼트는 커스텀 `FGameplayEffectContext`를 쓴다. 이 컨텍스트가 만들어지려면 `Config/DefaultGame.ini`에 아래를 추가해야 한다.
+
+```ini
+[/Script/GameplayAbilities.AbilitySystemGlobals]
+AbilitySystemGlobalsClassName=/Script/OverdriveAbility.OverdriveAbilitySystemGlobals
+```
+
+GAS는 모든 이펙트 컨텍스트를 `UAbilitySystemGlobals::AllocGameplayEffectContext()`로 만든다. 이 설정이 없으면 엔진 기본 컨텍스트가 생성되고, 프래그먼트 API는 그 메모리를 파생 타입으로 간주해 접근한다.
+
+이미 자체 `UAbilitySystemGlobals` 파생 클래스를 쓰고 있다면, 그 클래스가 `UOverdriveAbilitySystemGlobals`를 상속하거나 `AllocGameplayEffectContext()`에서 `FOverdriveGameplayEffectContext`를 반환하도록 한다.
 
 ## 상태
 

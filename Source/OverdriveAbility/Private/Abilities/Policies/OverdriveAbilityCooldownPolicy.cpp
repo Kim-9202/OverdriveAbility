@@ -8,10 +8,3 @@ UOverdriveGameplayAbility* UOverdriveAbilityCooldownPolicy::GetOwnerAbility() co
 {
 	return GetTypedOuter<UOverdriveGameplayAbility>();
 }
-
-#if WITH_EDITOR
-EDataValidationResult UOverdriveAbilityCooldownPolicy::IsDataValid(FDataValidationContext& Context) const
-{
-	return Super::IsDataValid(Context);
-}
-#endif

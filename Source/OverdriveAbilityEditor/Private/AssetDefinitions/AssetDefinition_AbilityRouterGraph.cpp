@@ -48,7 +48,7 @@ EAssetCommandResult UAssetDefinition_AbilityRouterGraph::PerformAssetDiff(const 
 		return EAssetCommandResult::Unhandled;
 	}
 
-	const TSharedRef<SDetailsDiff> DetailsDiff = SDetailsDiff::CreateDiffWindow(DiffArgs.OldAsset, DiffArgs.NewAsset, DiffArgs.OldRevision, DiffArgs.NewRevision, UDataAsset::StaticClass());
+	const TSharedRef<SDetailsDiff> DetailsDiff = SDetailsDiff::CreateDiffWindow(DiffArgs.OldAsset, DiffArgs.NewAsset, DiffArgs.OldRevision, DiffArgs.NewRevision, UOverdriveAbilityRouterGraph::StaticClass());
 	// allow users to edit NewAsset if it's a local asset
 	if (DiffArgs.NewAsset != nullptr && !FPackageName::IsTempPackage(DiffArgs.NewAsset->GetPackage()->GetName()))
 	{

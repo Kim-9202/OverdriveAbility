@@ -92,7 +92,7 @@ void FAbilityRouterGraphDragDropAction::HoverTargetChanged()
 					TSharedPtr<SGraphNode> NodeWidget = TargetPin->GetOwningNode()->DEPRECATED_NodeWidget.Pin();
 					if (NodeWidget.IsValid())
 					{
-						NodeWidget->NotifyDisallowedPinConnection(StartingPinObj, TargetPinObj);
+						NodeWidget->NotifyDisallowedPinConnection(StartingPinObj, TargetPin);
 					}
 				}
 			}

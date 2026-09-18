@@ -19,7 +19,7 @@ private:
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo& ActivationInfo, const FGameplayEventData* EventData = nullptr) const override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Cooldown", meta = (ForceInlineRow, AllowPrivateAccess = "true"))
-	TMap<FGameplayTag, float> NameSetByCallerMap;
+	TMap<FName, float> NameSetByCallerMap;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Cooldown", meta = (ForceInlineRow, AllowPrivateAccess = "true"))
 	TMap<FGameplayTag, float> TagSetByCallerMap;

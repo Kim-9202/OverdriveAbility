@@ -7,7 +7,6 @@
 #include "EdAbilityRouterGraphNode.generated.h"
 
 class UOverdriveAbilityRouterNode;
-class SEdAbilityRouterGraphNode;
 class SGraphEditor;
 
 /**
@@ -23,8 +22,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Instanced, Category = "AbilityRouter")
 	TObjectPtr<UOverdriveAbilityRouterNode> RouterNode;
-
-	SEdAbilityRouterGraphNode* SEdRouterNode;
 
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;

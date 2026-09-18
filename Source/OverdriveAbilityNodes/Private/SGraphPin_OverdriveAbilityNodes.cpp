@@ -4,7 +4,8 @@
 #include "SGraphPin_OverdriveAbilityNodes.h"
 #include "Effects/OverdriveGameplayEffectTypes.h"
 #include "UObject/ObjectMacros.h"
-#include "K2Node_GetEffectContextFragment.h"
+#include "EdGraph/EdGraphSchema.h"
+#include "ScopedTransaction.h"
 
 void SGraphPin_ContextFragmentTypePin::Construct(const FArguments& InArgs, UEdGraphPin* InPin)
 {
@@ -41,10 +42,18 @@ TSharedRef<SWidget> SGraphPin_ContextFragmentTypePin::GetDefaultValueWidget()
             })
         .OnSelectionChanged_Lambda([this](TWeakObjectPtr<UScriptStruct> SelectedItem, ESelectInfo::Type)
             {
+                UEdGraphPin* PinObj = GetPinObj();
+                if (PinObj == nullptr)
+                {
+                    return;
+                }
+
                 SelectedStruct = SelectedItem;
 
-                this->GetPinObj()->DefaultObject = SelectedItem.Get();
-                StaticCast<UK2Node_GetEffectContextFragment*>(this->GetPinObj()->GetOwningNode())->RefreshPin();
+                // TrySetDefaultObject가 PinDefaultValueChanged를 불러 RefreshPin까지 이어진다.
+                const FScopedTransaction Transaction(NSLOCTEXT("OverdriveAbilityNodes", "ChangeFragmentTypePinValue", "Change Fragment Type Pin Value"));
+                PinObj->Modify();
+                PinObj->GetSchema()->TrySetDefaultObject(*PinObj, SelectedItem.Get());
             })
         .Content()
         [
